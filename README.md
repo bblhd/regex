@@ -41,9 +41,10 @@ Order of precedence follows the order presented in this list.
 | `\d` | Any decimal digit.
 | `\x` | Any hexadecimal digit.
 | `\m` | Any alphanumeric character.
+| `\w` | Any whitespace character.
 | `\n` | Newline character.
 | `\t` | Tab character.
 | `\r` | Carriage return.
-| `\s` | space character.
+| `\s` | Space character.
 | `$` | The end of the string.
 | `.` | Any character.
