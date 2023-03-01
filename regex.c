@@ -13,7 +13,7 @@ static bool atom(char **regex, char **string);
 
 size_t regex(char *pattern, char *string) {
 	char *start = string;
-	return disjunction(&pattern, &string) && *pattern=='\0' ? string-start : BADMATCH;
+	return disjunction(&pattern, &string) && *pattern=='\0' ? (size_t) (string-start) : BADMATCH;
 }
 
 static bool disjunction(char **regexp, char **stringp) {
