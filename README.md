@@ -19,8 +19,6 @@ When calling this function, *pattern* represents the regular expression and *str
 Both are assumed to be null-terminated strings.
 It returns the length of *string* that was needed to exhaust the regular expression, and `BADMATCH` if the regular expression didn't exhaust for any reason, including a badly formed regular expression.
 
-Note that the match doesn't need to reach the end of *string*, so a check for matching it's entirety also needs verify that the returned value is equal to *string*'s length.
-
 ### Operations
 Order of precedence follows the order presented in this list.
 
@@ -47,4 +45,5 @@ Order of precedence follows the order presented in this list.
 | `\t` | Tab character.
 | `\r` | Carriage return.
 | `\s` | space character.
+| `$` | The end of the string.
 | `.` | Any character.
