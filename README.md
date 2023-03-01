@@ -5,7 +5,7 @@ A minimalist greedy LHS-first whole-string-match based regular expression librar
 Link the program against the provided `regex.c` file, and include the following, either in some header file, or in whatever source file the library is being used.
 ```C
 #define BADMATCH ((size_t) -1)
-size_t regex(char *pattern, char *string);
+size_t regex(char *, char *);
 ```
 
 ## Usage
