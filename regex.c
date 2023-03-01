@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#include <stdio.h>
+
 #define BADMATCH ((size_t)-1)
 size_t regex(char *pattern, char *string);
 
@@ -110,7 +112,16 @@ static bool atom(char **regexp, char **stringp) {
 	char *string = *stringp;
 	bool matching = false;
 	
-	if (*regex == '(') {
+	if (*regex == '$') {
+		regex++;
+		matching = *string == '\0';
+	} else if (*string == '\0') {
+		matching = false;
+	} else if (*regex == '.') {
+		regex++;
+		matching = *string++ != '\0';
+		if (matching) string++;
+	} else if (*regex == '(') {
 		regex++;
 		matching = disjunction(&regex, &string);
 		if (*regex == ')') regex++;
@@ -134,12 +145,6 @@ static bool atom(char **regexp, char **stringp) {
 			case 's': matching = *string++ == ' '; break;
 			default: matching = c == *string++;
 		}
-	} else if (*regex == '.') {
-		regex++;
-		matching = *string++ != '\0';
-	} else if (*regex == '$') {
-		regex++;
-		matching = *string == '\0';
 	} else {
 		matching = *regex++ == *string++;
 	}
