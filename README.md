@@ -1,5 +1,5 @@
 # regex
-A minimalist greedy LHS-first whole-string-match based regular expression library.
+A minimalist greedy LHS-first whole-string-match based regular expression library. (*Currently doesn't support unicode*)
 
 ## Installation
 Link the program against the provided `regex.c` file, and include the following, either in some header file, or in whatever source file the library is being used.
@@ -17,6 +17,7 @@ size_t regex(char *pattern, char *string);
 
 When calling this function, *pattern* represents the regular expression and *string* represents the string to match against.
 Both are assumed to be null-terminated strings.
+
 It returns the length of *string* that was needed to exhaust the regular expression, and `BADMATCH` if the regular expression didn't exhaust for any reason, including a badly formed regular expression.
 
 ### Operations
