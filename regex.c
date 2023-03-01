@@ -119,14 +119,15 @@ static bool atom(char **regexp, char **stringp) {
 	} else if (*regex == '\\') {
 		regex++;
 		char c = *regex++;
-		switch (*regex++) {
-			case 'a': matching = isalpha(*string++); break;
+		switch (c) {
 			case 'l': matching = islower(*string++); break;
 			case 'u': matching = isupper(*string++); break;
-			case 'm': matching = isalnum(*string++); break;
+			case 'a': matching = isalpha(*string++); break;
 			case 'p': matching = ispunct(*string++); break;
 			case 'd': matching = isdigit(*string++); break;
 			case 'x': matching = isxdigit(*string++); break;
+			case 'm': matching = isalnum(*string++); break;
+			case 'w': matching = isspace(*string++); break;
 			case 'n': matching = *string++ == '\n'; break;
 			case 't': matching = *string++ == '\t'; break;
 			case 'r': matching = *string++ == '\r'; break;
@@ -136,6 +137,9 @@ static bool atom(char **regexp, char **stringp) {
 	} else if (*regex == '.') {
 		regex++;
 		matching = *string++ != '\0';
+	} else if (*regex == '$') {
+		regex++;
+		matching = *string == '\0';
 	} else {
 		matching = *regex++ == *string++;
 	}
