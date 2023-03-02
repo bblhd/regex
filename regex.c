@@ -15,7 +15,7 @@ static bool atom(char **regex, char **string);
 
 size_t regex(char *pattern, char *string) {
 	char *start = string;
-	return disjunction(&pattern, &string) && *pattern=='\0' ? string-start : BADMATCH;
+	return disjunction(&pattern, &string) && *pattern=='\0' ? (size_t) (string - start) : BADMATCH;
 }
 
 static bool disjunction(char **regexp, char **stringp) {
@@ -27,12 +27,13 @@ static bool disjunction(char **regexp, char **stringp) {
 		char *ending = string;
 		matching = exclusion(&regex, &string);
 		if (matching) ending = string;
-		while (*regex == '|') {
+		while (*regex == '|' && !matching) {
 			regex++;
 			char newmatch = exclusion(&regex, &string);
 			if (newmatch && !matching) ending = string;
 			matching = matching || newmatch;
 		}
+		while (*regex != ')' && *regex != '\0') regex++;
 		string = ending;
 	}
 	
@@ -51,12 +52,13 @@ static bool exclusion(char **regexp, char **stringp) {
 	} else if (*regex != '|' && *regex != ')' && *regex != '\0') {
 		matching = sequence(&regex, &string);
 		char *ending = string;
-		while (*regex == '-') {
+		while (*regex == '-' && matching) {
 			regex++;
 			string = *stringp;
 			bool matchseg = sequence(&regex, &string);
 			matching = matching && !(matchseg && string==ending);
 		}
+		while (*regex != '|' && *regex != ')' && *regex != '\0') regex++;
 		string = ending;
 	}
 	
@@ -70,10 +72,11 @@ static bool sequence(char **regexp, char **stringp) {
 	char *string = *stringp;
 	bool matching = true;
 	
-	while (*regex != '-' && *regex != '|' && *regex != ')' && *regex != '\0') {
+	while (matching && *regex != '-' && *regex != '|' && *regex != ')' && *regex != '\0') {
 		bool newmatch = compound(&regex, &string);
 		matching = matching && newmatch;
 	};
+	while (*regex != '-' && *regex != '|' && *regex != ')' && *regex != '\0') regex++;
 	
 	*regexp = regex;
 	if (matching) *stringp = string;
@@ -113,7 +116,29 @@ static bool atom(char **regexp, char **stringp) {
 	
 	if (*regex == '(') {
 		regex++;
-		matching = disjunction(&regex, &string);
+		if (*regex == '?') {
+			regex++;
+			if (*regex == '=') {
+				regex++;
+				matching = disjunction(&regex, &string);
+				string = *stringp;
+			} else if (*regex == '!') {
+				regex++;
+				matching = !disjunction(&regex, &string);
+				string = *stringp;
+			} else {
+				int depth = 1;
+				matching = false;
+				while (depth > 0 && *regex != '\0') {
+					if (*regex == '(') depth++;
+					else if (*regex == ')') depth--;
+					else if (*regex == '\\' && regex[1] != '\0') regex++;
+					regex++;
+				}
+			}
+		} else {
+			matching = disjunction(&regex, &string);
+		}
 		if (*regex == ')') regex++;
 	} else if (*regex == '?' || *regex == '*' || *regex == '+' || *regex == '|' || *regex == '-' || *regex == ')' || *regex == '\0') {
 		matching = false;
