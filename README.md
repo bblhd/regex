@@ -30,6 +30,8 @@ Order of precedence follows the order presented in this list.
 - `A+` Matches one or more instances of A.
 - `A?` Matches A optionally.
 - `(...)` Matches anything in between the brackets.
+- `(?=...)` Regex lookahead, matches the appearance of anything within the brackets without traversing the string
+- `(?!...)` Regex negative lookahead, same as previous, but matches non-appearances
 
 ### Special characters
 | Symbol | Matches
