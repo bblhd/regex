@@ -15,7 +15,7 @@ static bool atom(char **regex, char **string);
 
 size_t regex(char *pattern, char *string) {
 	char *start = string;
-	return disjunction(&pattern, &string) && *pattern=='\0' ? (size_t) (string-start) : BADMATCH;
+	return disjunction(&pattern, &string) && *pattern=='\0' ? string-start : BADMATCH;
 }
 
 static bool disjunction(char **regexp, char **stringp) {
@@ -46,13 +46,10 @@ static bool exclusion(char **regexp, char **stringp) {
 	char *string = *stringp;
 	bool matching = true;
 	
-	if (*regex != '|' && *regex != ')' && *regex != '\0') {
-		if (*regex == '-') {
-			regex++;
-			matching = !sequence(&regex, &string);
-		} else {
-			matching = sequence(&regex, &string);
-		}
+	if (*regex == '-') {
+		matching = false;
+	} else if (*regex != '|' && *regex != ')' && *regex != '\0') {
+		matching = sequence(&regex, &string);
 		char *ending = string;
 		while (*regex == '-') {
 			regex++;
@@ -97,9 +94,11 @@ static bool compound(char **regexp, char **stringp) {
 		regex++;
 	}
 	if (couldMatchNone) matching = true;
+	char *prevstring = string;
 	if (matching && couldMatchMore) do {
 		regex = *regexp;
-	} while (atom(&regex, &string));
+		prevstring = string;
+	} while (atom(&regex, &string) && string > prevstring);
 	while (*regex=='?' || *regex=='*' || *regex=='+') regex++;
 	
 	*regexp = regex;
@@ -112,16 +111,7 @@ static bool atom(char **regexp, char **stringp) {
 	char *string = *stringp;
 	bool matching = false;
 	
-	if (*regex == '$') {
-		regex++;
-		matching = *string == '\0';
-	} else if (*string == '\0') {
-		matching = false;
-	} else if (*regex == '.') {
-		regex++;
-		matching = *string++ != '\0';
-		if (matching) string++;
-	} else if (*regex == '(') {
+	if (*regex == '(') {
 		regex++;
 		matching = disjunction(&regex, &string);
 		if (*regex == ')') regex++;
@@ -145,6 +135,12 @@ static bool atom(char **regexp, char **stringp) {
 			case 's': matching = *string++ == ' '; break;
 			default: matching = c == *string++;
 		}
+	} else if (*regex == '.') {
+		regex++;
+		matching = *string++ != '\0';
+	} else if (*regex == '$') {
+		regex++;
+		matching = *string == '\0';
 	} else {
 		matching = *regex++ == *string++;
 	}
