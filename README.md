@@ -25,7 +25,6 @@ Order of precedence follows the order presented in this list.
 
 - `A|B` Matches either A or B.
 - `A-B` Matches A but not B.
-- `-A` Matches anything that isn't A.
 - `AB` Matches A followed by B.
 - `A*` Matches zero or more instances of A.
 - `A+` Matches one or more instances of A.
